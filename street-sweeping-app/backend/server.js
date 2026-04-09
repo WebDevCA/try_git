@@ -60,6 +60,56 @@ app.post('/api/subscribe', getUserMiddleware, async (req, res) => {
     }
 });
 
+// Test notification endpoint (for debugging)
+app.post('/api/test-notification', getUserMiddleware, async (req, res) => {
+    try {
+        const subscriptions = await db.getPushSubscriptions(req.user.id);
+
+        if (subscriptions.length === 0) {
+            return res.status(404).json({ error: 'No push subscriptions found for this device' });
+        }
+
+        const { sendPushNotification } = require('./notificationScheduler');
+        let sentCount = 0;
+        let errors = [];
+
+        for (const sub of subscriptions) {
+            const subscription = {
+                endpoint: sub.endpoint,
+                keys: { p256dh: sub.p256dh, auth: sub.auth }
+            };
+
+            const payload = {
+                title: 'Test Notification 🔔',
+                body: 'If you see this, push notifications are working correctly!',
+                icon: '/icons/streetSweeperAppIcon.png',
+                vibrate: [200, 100, 200],
+                tag: 'test-notification',
+                requireInteraction: true
+            };
+
+            try {
+                const success = await sendPushNotification(subscription, payload);
+                if (success) sentCount++;
+            } catch (err) {
+                errors.push(err.message);
+            }
+        }
+
+        console.log(`Test notification sent to ${sentCount}/${subscriptions.length} subscriptions`);
+
+        res.json({
+            success: true,
+            sent: sentCount,
+            total: subscriptions.length,
+            errors: errors.length > 0 ? errors : undefined
+        });
+    } catch (error) {
+        console.error('Error sending test notification:', error);
+        res.status(500).json({ error: 'Failed to send test notification' });
+    }
+});
+
 // Get all schedules for user
 app.get('/api/schedules', getUserMiddleware, async (req, res) => {
     try {
