@@ -336,9 +336,18 @@ function updateNextSweepingDisplay() {
 }
 
 function getNextSweepingDate() {
-    if (state.schedules.length === 0) return null;
+    console.log('DEBUG: Finding next sweeping date...');
+    console.log('DEBUG: state.schedules:', state.schedules);
+
+    if (state.schedules.length === 0) {
+        console.log('DEBUG: No schedules in state');
+        return null;
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    console.log('DEBUG: Today:', today.toDateString());
+
     for (let i = 0; i < 90; i++) {
         const checkDate = new Date(today);
         checkDate.setDate(today.getDate() + i);
@@ -346,13 +355,26 @@ function getNextSweepingDate() {
         const movedTo = state.exceptions.find(ex => ex.movedToDate === dateStr);
         if (movedTo) return { date: checkDate, schedule: state.schedules.find(s => s.active) };
         if (state.exceptions.some(ex => ex.date === dateStr)) continue;
+
         for (const schedule of state.schedules) {
-            if (schedule.active && checkDate.getDay() === schedule.dayOfWeek) {
+            if (!schedule.active) {
+                console.log('DEBUG: Schedule inactive:', schedule.name);
+                continue;
+            }
+
+            if (checkDate.getDay() === schedule.dayOfWeek) {
                 const weekOfMonth = Math.ceil(checkDate.getDate() / 7);
-                if (schedule.weekPattern.includes(weekOfMonth)) return { date: checkDate, schedule };
+                console.log(`DEBUG: Checking ${checkDate.toDateString()}: week=${weekOfMonth}, pattern=${JSON.stringify(schedule.weekPattern)}`);
+
+                if (schedule.weekPattern.includes(weekOfMonth)) {
+                    console.log('DEBUG: MATCH FOUND!', checkDate.toDateString(), schedule.name);
+                    return { date: checkDate, schedule };
+                }
             }
         }
     }
+
+    console.log('DEBUG: No match found in next 90 days');
     return null;
 }
 
