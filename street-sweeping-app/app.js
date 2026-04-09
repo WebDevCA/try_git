@@ -63,10 +63,10 @@ async function loadDataFromBackend() {
                 id: s.id,
                 name: s.label || 'Street Sweeping',
                 dayOfWeek: s.day_of_week,
-                weekPattern: JSON.parse(s.week_pattern),
+                weekPattern: s.week_pattern || JSON.parse(s.week_pattern),
                 startTime: s.start_time,
                 endTime: s.end_time,
-                active: s.active === 1
+                active: !!s.active  // Convert to boolean - handles both number (1/0) and boolean (true/false)
             }));
         }
 
@@ -336,17 +336,28 @@ function updateNextSweepingDisplay() {
 }
 
 function getNextSweepingDate() {
-    console.log('DEBUG: Finding next sweeping date...');
-    console.log('DEBUG: state.schedules:', state.schedules);
+    console.log('=== DEBUG: Finding next sweeping date ===');
+    console.log('DEBUG: state.schedules:', JSON.stringify(state.schedules, null, 2));
+    console.log('DEBUG: Number of schedules:', state.schedules.length);
 
     if (state.schedules.length === 0) {
-        console.log('DEBUG: No schedules in state');
+        console.error('DEBUG: No schedules in state - this is why "No schedule set" is showing');
+        return null;
+    }
+
+    // Check if any schedules are active
+    const activeSchedules = state.schedules.filter(s => s.active);
+    console.log('DEBUG: Active schedules:', activeSchedules.length, '/', state.schedules.length);
+
+    if (activeSchedules.length === 0) {
+        console.error('DEBUG: All schedules are INACTIVE - this is why "No schedule set" is showing');
+        console.error('DEBUG: Set schedule.active = true to fix this');
         return null;
     }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    console.log('DEBUG: Today:', today.toDateString());
+    console.log('DEBUG: Today:', today.toDateString(), '(day of week:', today.getDay() + ')');
 
     for (let i = 0; i < 90; i++) {
         const checkDate = new Date(today);
@@ -358,23 +369,27 @@ function getNextSweepingDate() {
 
         for (const schedule of state.schedules) {
             if (!schedule.active) {
-                console.log('DEBUG: Schedule inactive:', schedule.name);
+                if (i === 0) { // Only log on first iteration to avoid spam
+                    console.warn('DEBUG: Schedule SKIPPED (inactive):', schedule.name, '- dayOfWeek:', schedule.dayOfWeek);
+                }
                 continue;
             }
 
             if (checkDate.getDay() === schedule.dayOfWeek) {
                 const weekOfMonth = Math.ceil(checkDate.getDate() / 7);
-                console.log(`DEBUG: Checking ${checkDate.toDateString()}: week=${weekOfMonth}, pattern=${JSON.stringify(schedule.weekPattern)}`);
+                if (i < 14) { // Only log first 2 weeks to avoid spam
+                    console.log(`DEBUG: Checking ${checkDate.toDateString()}: week=${weekOfMonth}, dayOfWeek=${checkDate.getDay()}, pattern=${JSON.stringify(schedule.weekPattern)}, scheduleName="${schedule.name}"`);
+                }
 
                 if (schedule.weekPattern.includes(weekOfMonth)) {
-                    console.log('DEBUG: MATCH FOUND!', checkDate.toDateString(), schedule.name);
+                    console.log('✅ DEBUG: MATCH FOUND!', checkDate.toDateString(), schedule.name);
                     return { date: checkDate, schedule };
                 }
             }
         }
     }
 
-    console.log('DEBUG: No match found in next 90 days');
+    console.error('DEBUG: No match found in next 90 days');
     return null;
 }
 
@@ -448,3 +463,37 @@ function setupPWAInstall() {
 }
 
 setInterval(updateNextSweepingDisplay, 60000);
+
+// Global debug helper - users can run this in console to inspect state
+window.debugSchedules = function() {
+    console.log('=== SCHEDULE DEBUG INFO ===');
+    console.log('Total schedules:', state.schedules.length);
+    console.log('Active schedules:', state.schedules.filter(s => s.active).length);
+    console.log('\nSchedule details:');
+    state.schedules.forEach((s, i) => {
+        const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][s.dayOfWeek];
+        console.log(`\n${i + 1}. ${s.name}`);
+        console.log(`   Active: ${s.active ? '✅ YES' : '❌ NO'}`);
+        console.log(`   Day: ${dayName} (${s.dayOfWeek})`);
+        console.log(`   Weeks: ${JSON.stringify(s.weekPattern)}`);
+        console.log(`   Time: ${s.startTime} - ${s.endTime}`);
+    });
+    console.log('\n=== To fix inactive schedules, run: ===');
+    console.log('window.fixInactiveSchedules()');
+    return state.schedules;
+};
+
+// Fix inactive schedules
+window.fixInactiveSchedules = async function() {
+    console.log('Attempting to reactivate all schedules...');
+    for (const schedule of state.schedules) {
+        if (!schedule.active) {
+            schedule.active = true;
+            console.log('✅ Reactivated:', schedule.name);
+        }
+    }
+    saveState();
+    renderSchedules();
+    updateNextSweepingDisplay();
+    console.log('Done! Refresh the page if needed.');
+};
