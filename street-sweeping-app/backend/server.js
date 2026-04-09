@@ -119,7 +119,7 @@ app.get('/api/schedules', getUserMiddleware, async (req, res) => {
         const parsedSchedules = schedules.map(s => ({
             ...s,
             weekPattern: JSON.parse(s.week_pattern),
-            active: !!s.active
+            active: s.active !== undefined && s.active !== null ? !!s.active : true  // Default to true
         }));
 
         res.json(parsedSchedules);
@@ -144,6 +144,21 @@ app.post('/api/schedules', getUserMiddleware, async (req, res) => {
     } catch (error) {
         console.error('Error creating schedule:', error);
         res.status(500).json({ error: 'Failed to create schedule' });
+    }
+});
+
+// Update schedule
+app.patch('/api/schedules/:id', getUserMiddleware, async (req, res) => {
+    try {
+        const scheduleId = req.params.id;
+        const updates = req.body;
+
+        await db.updateSchedule(req.user.id, scheduleId, updates);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating schedule:', error);
+        res.status(500).json({ error: 'Failed to update schedule' });
     }
 });
 

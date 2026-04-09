@@ -66,7 +66,7 @@ async function loadDataFromBackend() {
                 weekPattern: s.week_pattern || JSON.parse(s.week_pattern),
                 startTime: s.start_time,
                 endTime: s.end_time,
-                active: !!s.active  // Convert to boolean - handles both number (1/0) and boolean (true/false)
+                active: s.active !== undefined && s.active !== null ? !!s.active : true  // Default to true for backwards compatibility
             }));
         }
 

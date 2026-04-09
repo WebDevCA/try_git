@@ -81,6 +81,11 @@ async function initializeDatabase() {
             ALTER TABLE reminders ADD COLUMN IF NOT EXISTS timezone TEXT DEFAULT 'UTC'
         `);
 
+        // Migration: Set all schedules to active = 1 by default (fixes schedules with null or 0)
+        await client.query(`
+            UPDATE schedules SET active = 1 WHERE active IS NULL OR active = 0
+        `);
+
         // Notification log
         await client.query(`
             CREATE TABLE IF NOT EXISTS notification_log (
@@ -168,6 +173,36 @@ async function createSchedule(userId, schedule) {
     return { id: result.rows[0].id };
 }
 
+async function updateSchedule(userId, scheduleId, updates) {
+    const allowedFields = ['label', 'day_of_week', 'week_pattern', 'start_time', 'end_time', 'active'];
+    const setClauses = [];
+    const values = [];
+    let paramIndex = 1;
+
+    Object.keys(updates).forEach(key => {
+        const dbKey = key === 'dayOfWeek' ? 'day_of_week' :
+                      key === 'weekPattern' ? 'week_pattern' :
+                      key === 'startTime' ? 'start_time' :
+                      key === 'endTime' ? 'end_time' : key;
+
+        if (allowedFields.includes(dbKey)) {
+            setClauses.push(`${dbKey} = $${paramIndex}`);
+            values.push(dbKey === 'week_pattern' && typeof updates[key] === 'object' ?
+                       JSON.stringify(updates[key]) :
+                       dbKey === 'active' ? (updates[key] ? 1 : 0) :
+                       updates[key]);
+            paramIndex++;
+        }
+    });
+
+    if (setClauses.length === 0) return;
+
+    values.push(scheduleId, userId);
+    const query = `UPDATE schedules SET ${setClauses.join(', ')} WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}`;
+
+    await pool.query(query, values);
+}
+
 async function deleteSchedule(userId, scheduleId) {
     await pool.query('DELETE FROM schedules WHERE id = $1 AND user_id = $2', [scheduleId, userId]);
 }
@@ -248,6 +283,7 @@ module.exports = {
     deletePushSubscription,
     getSchedules,
     createSchedule,
+    updateSchedule,
     deleteSchedule,
     getExceptions,
     createException,
