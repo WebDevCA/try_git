@@ -1,0 +1,24 @@
+{
+  "name": "Street Sweeping Reminder",
+  "short_name": "Sweeping",
+  "description": "Never get a street sweeping ticket again. Simple reminders for street sweeping schedules.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/streetSweeperAppIcon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/streetSweeperAppIcon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

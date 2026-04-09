@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Never get a street sweeping ticket again. Simple reminders for street sweeping schedules.">
+    <title>Street Sweeping Reminder</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" href="icons/streetSweeperAppIcon.png">
+
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-icon">
+                <img src="icons/bell.svg" alt="Bell notification" class="bell-logo">
+            </div>
+            <h1>Street Sweeping Reminder</h1>
+            <p class="subtitle">Never miss your street sweeping day</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Next Sweeping Date Display -->
+            <section class="next-sweeping-card" id="nextSweepingCard">
+                <div class="card-header">
+                    <h2>Next Sweeping</h2>
+                </div>
+                <div class="next-date-display" id="nextDateDisplay">
+                    <div class="hero-image-container" id="heroImage">
+                        <img src="images/hero-image.png" alt="Street Sweeping Reminder" class="hero-image">
+                        <p class="hero-text">Add your schedule below to get started!</p>
+                    </div>
+                    <div class="date-large" id="nextDateLarge">No schedule set</div>
+                    <div class="time-info" id="timeInfo"></div>
+                    <div class="countdown" id="countdown"></div>
+                </div>
+            </section>
+
+            <!-- Schedule Setup Section -->
+            <section class="schedule-section">
+                <h2>Your Schedule</h2>
+                <button class="btn-primary" id="addScheduleBtn">+ Add Schedule</button>
+                <div id="scheduleList" class="schedule-list"></div>
+            </section>
+
+            <!-- Reminder Settings -->
+            <section class="reminder-section">
+                <h2>Reminder Times</h2>
+                <div class="reminder-settings">
+                    <div class="setting-item">
+                        <label for="nightBeforeTime">Night Before:</label>
+                        <input type="time" id="nightBeforeTime" value="20:00">
+                    </div>
+                    <div class="setting-item">
+                        <label for="morningOfTime">Morning Of:</label>
+                        <input type="time" id="morningOfTime" value="07:00">
+                    </div>
+                    <button class="btn-secondary" id="saveRemindersBtn">Save Reminder Times</button>
+                </div>
+            </section>
+
+            <!-- Exceptions Section -->
+            <section class="exceptions-section">
+                <h2>Schedule Changes & Holidays</h2>
+                <button class="btn-secondary" id="addExceptionBtn">+ Add Schedule Change</button>
+                <div id="exceptionsList" class="exceptions-list"></div>
+            </section>
+
+            <!-- Install Prompt -->
+            <section class="install-section" id="installSection" style="display: none;">
+                <div class="install-card">
+                    <p>📱 Install this app for the best experience and reliable notifications!</p>
+                    <button class="btn-primary" id="installBtn">Install App</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for Adding Schedule -->
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Street Sweeping Schedule</h3>
+                <button class="close-btn" id="closeScheduleModal">&times;</button>
+            </div>
+            <form id="scheduleForm">
+                <div class="form-group">
+                    <label for="scheduleName">Label (optional):</label>
+                    <input type="text" id="scheduleName" placeholder="e.g., North side, South side">
+                </div>
+
+                <div class="form-group">
+                    <label for="dayOfWeek">Day of Week:</label>
+                    <select id="dayOfWeek" required>
+                        <option value="">Select day...</option>
+                        <option value="0">Sunday</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Which weeks of the month:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="weekPattern" value="1"> 1st</label>
+                        <label><input type="checkbox" name="weekPattern" value="2"> 2nd</label>
+                        <label><input type="checkbox" name="weekPattern" value="3"> 3rd</label>
+                        <label><input type="checkbox" name="weekPattern" value="4"> 4th</label>
+                        <label><input type="checkbox" name="weekPattern" value="5"> 5th</label>
+                    </div>
+                    <small>Select which weeks this schedule applies to</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">Start Time:</label>
+                    <input type="time" id="startTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">End Time:</label>
+                    <input type="time" id="endTime" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelSchedule">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Exception -->
+    <div id="exceptionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Schedule Change</h3>
+                <button class="close-btn" id="closeExceptionModal">&times;</button>
+            </div>
+            <form id="exceptionForm">
+                <div class="form-group">
+                    <label for="exceptionDate">Original Date:</label>
+                    <input type="date" id="exceptionDate" required>
+                    <small>The scheduled date that will be moved or cancelled</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="movedToDate">Moved To (optional):</label>
+                    <input type="date" id="movedToDate">
+                    <small>Leave empty if sweeping is cancelled (not rescheduled)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="exceptionReason">Reason (optional):</label>
+                    <input type="text" id="exceptionReason" placeholder="e.g., New Year's Day, Holiday">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelException">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Change</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
