@@ -138,20 +138,24 @@ async function checkAndSendNotifications() {
             // Calculate days until sweeping using the user's local timezone
             const userTimezone = reminders.timezone || 'UTC';
             const todayStr = getLocalDateStr(userTimezone);
-            const sweepingStr = date.toISOString().split('T')[0];
-            const todayMs = new Date(todayStr + 'T00:00:00.000Z').getTime();
-            const sweepingMs = new Date(sweepingStr + 'T00:00:00.000Z').getTime();
-            const daysBefore = Math.round((sweepingMs - todayMs) / (1000 * 60 * 60 * 24));
+            const sweepingStr = new Intl.DateTimeFormat('en-CA', { timeZone: userTimezone }).format(date);
+
+            // Parse both dates as simple date comparisons (both in user's timezone)
+            const todayParts = todayStr.split('-').map(Number);
+            const sweepingParts = sweepingStr.split('-').map(Number);
+            const todayDate = new Date(todayParts[0], todayParts[1] - 1, todayParts[2]);
+            const sweepingDate = new Date(sweepingParts[0], sweepingParts[1] - 1, sweepingParts[2]);
+            const daysBefore = Math.round((sweepingDate - todayDate) / (1000 * 60 * 60 * 24));
 
             const dateStr = date.toISOString().split('T')[0];
 
-            console.log(`User ${user.id}: daysBefore=${daysBefore}, currentTime=${currentHour}:${currentMinute}`);
+            console.log(`User ${user.id}: daysBefore=${daysBefore}, today=${todayStr}, sweeping=${sweepingStr}, currentUTC=${currentHour}:${String(currentMinute).padStart(2, '0')}`);
 
             // Night before notification (if sweeping is tomorrow)
             if (daysBefore === 1) {
                 const [nightHour, nightMinute] = reminders.night_before.split(':').map(Number);
 
-                console.log(`User ${user.id}: Checking night-before: need ${nightHour}:${nightMinute}, have ${currentHour}:${currentMinute}`);
+                console.log(`User ${user.id}: Eligible for night-before. Need UTC ${nightHour}:${String(nightMinute).padStart(2, '0')}, have ${currentHour}:${String(currentMinute).padStart(2, '0')}`);
 
                 if (currentHour === nightHour && currentMinute === nightMinute) {
                     // Check if we already sent this notification
@@ -192,6 +196,8 @@ async function checkAndSendNotifications() {
             // Morning of notification (if sweeping is today)
             if (daysBefore === 0) {
                 const [morningHour, morningMinute] = reminders.morning_of.split(':').map(Number);
+
+                console.log(`User ${user.id}: Eligible for morning-of. Need UTC ${morningHour}:${String(morningMinute).padStart(2, '0')}, have ${currentHour}:${String(currentMinute).padStart(2, '0')}`);
 
                 if (currentHour === morningHour && currentMinute === morningMinute) {
                     // Check if we already sent this notification

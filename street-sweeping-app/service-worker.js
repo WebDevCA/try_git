@@ -1,6 +1,6 @@
 // Service Worker for Street Sweeping Reminder App
 
-const CACHE_NAME = 'street-sweeping-v2';
+const CACHE_NAME = 'street-sweeping-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -88,6 +88,18 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   event.waitUntil(
-    clients.openWindow('/')
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Check if there's already a window open
+        for (const client of clientList) {
+          if (client.url === self.registration.scope && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // If no window is open, open a new one
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
+      })
   );
 });
