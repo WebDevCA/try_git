@@ -60,9 +60,12 @@ self.addEventListener('push', (event) => {
     title: 'Street Sweeping Reminder',
     body: 'Time to move your car!',
     icon: '/icons/streetSweeperAppIcon.png',
+    badge: '/icons/streetSweeperAppIcon.png',
     vibrate: [200, 100, 200],
     tag: 'street-sweeping-reminder',
     requireInteraction: true,
+    renotify: true,
+    silent: false,
     data: { url: '/' }
   };
 
