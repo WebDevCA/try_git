@@ -1,0 +1,12 @@
+{
+  "name": "street-sweeping-app",
+  "version": "1.0.0",
+  "description": "Street Sweeping Reminder PWA with push notifications",
+  "scripts": {
+    "start": "cd backend && npm install && node server.js",
+    "postinstall": "cd backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
