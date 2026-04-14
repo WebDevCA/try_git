@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OC Mex Food</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background-image: url(https://ocmexfood.com/blogbackground.jpg);
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 60px 20px 40px;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .card {
+            background-color: rgba(0, 0, 0, 0.70);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            padding: 32px 36px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: #C86A30;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            letter-spacing: 0.02em;
+        }
+
+        .intro {
+            color: rgba(180, 210, 225, 0.88);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin-bottom: 24px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+        }
+
+        .links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 24px;
+        }
+
+        .link-item {
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            overflow: hidden;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .link-item:hover {
+            background-color: rgba(255, 255, 255, 0.13);
+            border-color: rgba(200, 106, 48, 0.40);
+        }
+
+        .link-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+        }
+
+        .link-header i {
+            color: #D4784A;
+            font-size: 1rem;
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .link-header a {
+            color: #E8C99A;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .link-header a:hover {
+            color: #ffffff;
+        }
+
+        .link-desc {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding-bottom 0.3s ease;
+            padding: 0 14px 0 44px;
+            color: rgba(195, 210, 218, 0.85);
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }
+
+        .link-item:hover .link-desc {
+            max-height: 120px;
+            padding-bottom: 12px;
+        }
+
+        .copyright {
+            color: rgba(82, 175, 207, 0.75);
+            font-size: 0.78rem;
+            text-align: center;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.03em;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>OC Mex Food</h1>
+        <p class="intro">Welcome to the most comprehensive website for information and reviews on Mexican restaurants and food in Orange County, CA.</p>
+
+        <ul class="links">
+            <li class="link-item">
+                <div class="link-header">
+                    <i class="fa-solid fa-blog"></i>
+                    <a href="http://ocmexfood.blogspot.com/">The Blog</a>
+                </div>
+                <p class="link-desc">The main hub of OC Mex Food &mdash; over 300 reviews of Mexican restaurants in Orange County, plus coverage of Mexican food found elsewhere in the county and reports on related events.</p>
+            </li>
+            <li class="link-item">
+                <div class="link-header">
+                    <i class="fa-brands fa-facebook"></i>
+                    <a href="http://www.facebook.com/ocmexfood">Facebook</a>
+                </div>
+                <p class="link-desc">Join us on Facebook where a different batch of news is posted and where you can also share your own highlights of dining adventures revolving around Mexican food in Orange County.</p>
+            </li>
+            <li class="link-item">
+                <div class="link-header">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <a href="http://x.com/ocmexfood">Twitter/X</a>
+                </div>
+                <p class="link-desc">Short news bites and key re-tweets from Mexican restaurants in Orange County. Tag your own tweets with &ldquo;@ocmexfood&rdquo; and they&rsquo;ll likely get re-tweeted.</p>
+            </li>
+            <li class="link-item">
+                <div class="link-header">
+                    <i class="fa-brands fa-instagram"></i>
+                    <a href="https://www.instagram.com/ocmexfood">Instagram</a>
+                </div>
+                <p class="link-desc">Follow @ocmexfood on Instagram for photos of Mexican restaurants, dishes, and food events throughout Orange County.</p>
+            </li>
+            <li class="link-item">
+                <div class="link-header">
+                    <i class="fa-brands fa-flickr"></i>
+                    <a href="http://www.flickr.com/photos/cziebarth/collections/72157602675390147/">Flickr</a>
+                </div>
+                <p class="link-desc">A large repository of photos of Mexican restaurants, food, and related events in Orange County.</p>
+            </li>
+        </ul>
+
+        <p class="copyright">&copy; Copyright OCMR 2005 &ndash; 2026</p>
+    </div>
+</body>
+</html>
